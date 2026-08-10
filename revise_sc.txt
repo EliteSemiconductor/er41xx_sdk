@@ -1,0 +1,147 @@
+ER4100 SDK_EZ  —  版本说明
+日期    : 2026-04-12
+前版本  : ER4100 Lierda 交付版  2026-02-06
+当前版本: ER4100 SDK_EZ
+
+================================================================================
+概述
+================================================================================
+2026-02-06 交付版为针对利尔达应用的最小化定制包：三个客制 EzFirm 专案 +
+一份客户固件（CA51_）+ EzGen V1.0。
+
+当前 SDK_EZ 为全面重构的通用 SDK，完整替代原利尔达定制包，覆盖更广泛的
+应用场景。专案命名、文件结构与文档均已标准化。
+
+================================================================================
+1.  EzGen（PC 配置工具）
+================================================================================
+  前版本   EzGen V1.0
+  当前版本 EzGen V2.1
+
+  V2.1 新增功能：
+  - GPIO 配置区块
+      可配置各 GPIO 引脚功能（例如将 GPIO1 配置为 TR_BSY 输出）。
+      TR_BSY 在 RX 窗口开启期间保持高电平，可配合示波器直接量测 WOR
+      RX 窗口时序。
+  - TRANSPARENT WITH PRESYNC 模式
+      GUI 中新增该 RF 工作模式选项。
+  - Frequency Table（频率表）
+      可在 GUI 中直接定义多信道频率表。
+  - 批量 .ini 文件加载
+      支持一次性加载并处理多个 EzGen .ini 配置文件。
+
+--------------------------------------------------------------------------------
+更新 2026-08-10：EzGen V2.1 -> EzCodeGen V2.2
+--------------------------------------------------------------------------------
+  工具改名 EzGen -> EzCodeGen（build 20260805）。
+  生成的 SPI_ER41xx_config.h 变化如下：
+  - 内嵌 _D_CODE 兼容宏 — 生成的头文件现直接定义 _D_CODE
+    （涵盖 SDCC / Keil C51 / IAR / AVR / XC8 / Renesas CC-RL /
+    CA78K0R / ARM 等），与原先透过共用 compiler_compat.h 提供的宏相同。
+    channel_pll_table、Initial_Reg_Array、TRx_Config_Array、
+    TRx_ConfigEx_Array 均改用 "_D_CODE const" 宣告，取代旧版硬编码的
+    "code const"（仅适用于 Keil C51）。
+  - TRx_Config_Array[] 顺序调整并新增区块：新增一段 PA（功率放大器）设定
+    （寄存器 0x1f00~0x1f38，共 15 笔），排在 TX/RX 设定之前。新顺序为：
+    PA 设定 -> TX 设定 -> RX 设定 -> Freq/Deviation/DataRate ->
+    Freq（Xtal）-> Power 设定。
+  本仓库内全部 18 个 EzFirm 专案均已同步更新（各专案新增
+  compiler_compat.h，四个阵列均改为 "_D_CODE const"）。
+
+================================================================================
+2.  EzFirm（嵌入式固件示例）
+================================================================================
+
+--- 2a.  专案命名 ---
+
+  前版本（利尔达定制）                    当前版本（标准 EzFirm）
+  ------------------------------------    ------------------------------------
+  ER4100_Lierda_TransparentTxRx           ER4100_EzFirm_TransTxRx
+  ER4100_Lierda_TransparentLongPkt        ER4100_EzFirm_TransTxRx_LongPkt
+  ER4100_Lierda_TransparentWOR            ER4100_EzFirm_TransWOR
+  （无）                                  ER4100_EzFirm_TransWOR_Ack（新增）
+  CA51_ 客户固件                          不包含于 SDK_EZ
+
+--- 2b.  长包（TransparentLongPkt → TransTxRx_LongPkt）---
+
+  两个版本均支持最大约 512 字节的 payload，通过 FIFO 阈值管理实现。
+  新版本统一了 API 命名，SPI_ER41xx_config.h 由 EzGen V2.1 生成。
+
+--- 2c.  WOR（TransparentWOR → TransWOR / TransWOR_Ack）---
+
+  前版本：仅含一个 WOR 接收专案。
+          前导码检测使用 0xAAAAAAAA；唤醒后切换同步字为 0x89CB8DC3
+          以接收实际数据包。
+
+  当前版本：拆分为两个 WOR 专案。
+    TransWOR     — 仅接收，基本流程与前版本一致。
+    TransWOR_Ack — 收到数据包后自动回复 3 字节 "ACK"
+                   （延迟 200ms → TX → 重启 WOR）。
+
+  WOR 参数（两个当前专案均适用）：
+    WUT 周期   : 100 ms（可选：10 / 50 / 100 / 500 ms，1 / 2 / 4 s）
+    RX 窗口    : 80 ms（WOR_CNT=4 × 20 ms）
+    同步字     : 通过 EzGen V2.1 / SPI_ER41xx_config.h 配置
+    GPIO1      : 预配置为 TR_BSY 输出，用于 RX 窗口时序量测
+
+--- 2d.  前版本未包含的新增专案 ---
+
+  透明传输模式：
+    ER4100_EzFirm_TransWOR_Ack           WOR 接收后自动回复 ACK
+    ER4100_EzFirm_TransTxRx_PER          误包率测试（透明模式）
+
+  IEEE 802.15.4 模式：
+    ER4100_EzFirm_802154TxRx             基本 802.15.4 双向收发，含硬件 CRC
+    ER4100_EzFirm_802154TxRx_Addressing  地址／PANID 过滤演示
+    ER4100_EzFirm_802154TxRx_CCA         带空闲信道评估（CCA）的发送
+    ER4100_EzFirm_802154TxRx_PER         误包率测试（802.15.4 模式）
+
+  NFC 模式（全部新增）：
+    ER4100_EzFirm_NFC_Field_Interrupt    通过 INT_N 中断检测磁场进入与离开
+    ER4100_EzFirm_NFC_Field_Polling      通过 SPI 轮询 PWRGOOD 位检测磁场
+    ER4100_EzFirm_NFC_Menu               磁场附着后通过 UART 菜单读写数据块
+    ER4100_EzFirm_NFC_ReadWrite          MCU 对 NFC 存储器（Block 4~19）读写
+    ER4100_EzFirm_NFC_StatusTrigger      INT_N 检测附着；USER_CFG4 触发状态
+                                         事件；SPI 轮询检测离开
+
+  测试 / 工具：
+    ER4100_EzFirm_SingleTone             持续发射单音载波，用于 RF 测试
+    ER4100_EzFirm_RSSI_Scan              CCA 模式信道 RSSI 扫描
+    ER4100_EzFirm_PowerSaving            P05 按键触发深度睡眠 / 唤醒
+    ER4100_EzFirm_PowerSaving_WUT        WUT 定时器自动唤醒的低功耗模式
+
+================================================================================
+3.  RF 驱动层（SPI_ER41xx）
+================================================================================
+  - API 名称已标准化：TRX_WRITEREG_U32、SET_U8_ARRAY
+    （旧名 TRX_WRITEREG_uint32_t、SET_uint8_t_ARRAY 已移除）
+  - 各专案按功能启用对应 feature flag：
+      EXTERN_RF_APIS_CCA         — 使用 CCA 的专案
+      EXTERN_RF_APIS_WUT         — 使用 WOR / WUT 的专案
+      EXTERN_RF_APIS_SINGLE_TONE — 仅 SingleTone 专案
+  - NFC 专案驱动层文件命名为 RF_NFC_APP.c / RF_NFC_APP.h
+    （其他专案使用 RF_App.c / RF_App.h）
+
+================================================================================
+4.  文档
+================================================================================
+  - 每个专案均附两份 Markdown 文档：
+      <专案名>_Eng.md         英文版
+      <专案名>_SChinese.md    简体中文版
+  - 文档内容涵盖：概述、流程图、参数说明、API 参考、目录结构、
+    层次架构、SPI/UART 引脚定义、Keil 包含路径、开机 UART 日志、
+    XTAPP_Scan 初始化保护说明。
+  - README.md 与 README_SC.md 列出全部 18 个专案及说明。
+  - UART 引脚已于文档中说明：TXD = P06，RXD = P07，波特率 115200。
+
+================================================================================
+5.  GitHub 仓库
+================================================================================
+  本仓库（github.com/MARCTSOU/03_01_EzFirm）为面向客户的通用公开下载点，
+  不针对特定客户。
+  首次上传于 2026-03-10（commit "ez firm initial backup"，当时为利尔达
+  定制包）；之后重构为上述通用 SDK_EZ 结构。
+
+================================================================================
+END
+================================================================================

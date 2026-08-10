@@ -1,0 +1,27 @@
+# Keil uVision build outputs
+Output/
+output/
+LST/
+lst/
+Listings/
+Objects/
+obj/
+
+# Keil user-specific / IDE files
+*.uvguix
+*.uvgui.*
+*.uvopt
+*.bak
+*.__i
+*.crf
+*.iex
+*.lnp
+*.dep
+*.o
+*.d
+*.axf
+JLinkLog.txt
+
+# OS files
+Thumbs.db
+.DS_Store
