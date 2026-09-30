@@ -1,7 +1,83 @@
 ER4100 SDK_EZ  —  版本说明
-日期    : 2026-04-12
+日期    : 2026-09-30
+前版本  : ER4100 SDK_EZ v1（EzFirm_N76E003 + EzGen / EzCodeGen V2.3）
+当前版本: ER4100 SDK_EZ v2.0（EzFirm 2.0 + EzToolkit V2.0）
+
+################################################################################
+SDK_EZ v2.0（2026-09-30）
+################################################################################
+
+================================================================================
+A.  EzGen / EzCodeGen  ->  EzToolkit V2.0
+================================================================================
+  移除   EzGen/EzCodeGen2_20260812_V2.3.exe（整个 EzGen/ 目录）
+  新增   Tools/ER41xx EzToolkit_V2.0_20260929.exe
+         Tools/EzToolkit_settings_common_example.ini
+         Tools/EzToolkit_settings_802154_example.ini
+
+  EzToolkit 为 Windows GUI 辅助开发工具（.NET Framework 4.8 / WinForms）。
+  保留 EzCodeGen 的寄存器生成功能，并搭配 DVB 评估板（USB 转 UART）新增
+  板上收发测试、频偏校准与量产参数固化，取代人工查表计算寄存器的流程。
+
+  Parameter 配置面板
+  - RF PARAM     ：晶振、频率／频段、发射功率（PA Config／Power LV）、
+                   GFSK 调制与封包参数（Preamble／Syncword／容错位）
+  - FREQ TABLE   ：多信道频率表管理
+  - TX FIFO MODE ：Transparent／Transparent+Presync／802.15.4
+  - GPIO         ：每个引脚独立配置模式／方向／上下拉／反相，含中断事件
+                   （INT_ST_*）
+  - PCR          ：电源管理（PCRMU）与 SHD 硬件关断控制
+
+  DVB Tester 测试面板（需连接 DVB 评估板）
+  - Packet TX     ：单包发射测试，支持随机 Payload、CRC 计算、
+                    发送包数／间隔／Infinite 模式
+  - Continuous TX ：SingleTone／Pattern（Bit_01010101、PRBS9）连续波测试
+  - Packet RX     ：接收计数统计（OK／Err）、RSSI 扫描
+  - State Ctrl    ：Idle／DeepSleep／Shutdown 电源状态切换
+
+  REG TABLE 寄存器操作
+  - 按分类／过滤查看所有寄存器实时数值
+  - 通过 UART 直接读写 DVB 上的寄存器（含 Write Multi 批量写入）
+  - 一键 Generate 生成 C 语言初始化数组（Initial_Reg_Array + 信道表），
+    可直接并入 EzFirm 固件工程
+
+  参数可另存／读取为 .ini 设定文件，方便工程间复用与量产参数固化。
+
+================================================================================
+B.  EzFirm 1.x（EzFirm_N76E003）  ->  EzFirm 2.0
+================================================================================
+  移除   EzFirm_N76E003/（18 个 N76E003 示例专案）
+  新增   Reference Code/EzFirm_v2_8051/  N76E003（8051），Keil C51
+         Reference Code/EzFirm_v2_M0/    Nano100（Cortex-M0，DVB 板），
+                                         Keil MDK，附 Nano100Lib
+
+  专案命名：ER4100_EzFirm_B_<Platform>_<Variant>
+    Platform  N76 = N76E003，DVB = DVB 板上的 Nano100
+
+  示例（两个平台均提供）：
+    TransTxRx            基本透明模式收发
+    TransTxRx_CCIT       透明模式收发，带序号与软件 CRC-CCITT 校验
+    TransTxRx_CCIT_PER   基于 TransTxRx_CCIT 的误包率（PER）测试
+    802154TxRx           IEEE 802.15.4 收发
+    GIO_TRBSY            通过 UART 命令将 GPIO0 切换为 TR_BSY 输出，
+                         观察收发忙碌时序
+
+  各专案的 SPI_ER41xx_config.h 改由 EzToolkit 生成。
+
+================================================================================
+C.  仓库结构
+================================================================================
+  Tools/             EzToolkit 及示例 .ini 文件
+  Reference Code/    EzFirm 2.0（8051 / M0）
+  Document/          SDK_EZ 用户指南
+  Datasheet/         ER4100 数据手册
+  Application Note/  应用笔记
+  GitHub：github.com/EliteSemiconductor/er41xx_sdk
+
+################################################################################
+历史记录 —— SDK_EZ v1（2026-04-12，更新至 2026-08）
 前版本  : ER4100 Lierda 交付版  2026-02-06
-当前版本: ER4100 SDK_EZ
+################################################################################
 
 ================================================================================
 概述
