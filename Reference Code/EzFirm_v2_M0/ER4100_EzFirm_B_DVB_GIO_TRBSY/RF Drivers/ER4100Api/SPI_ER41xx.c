@@ -279,6 +279,42 @@ STATUS_TRx TRx_PCRMU_Disable(void)
     TRx_WRITEREG(0x1a00, u8Array);
     return TRx_WRITEREG(0x1a08, u8Array);
 }
+/**
+ * @brief  Enable PCRMU Shutdown mode.
+ * @param  None
+ * @retval TRx_STATUS_SUCCESS = 0, TRx_STATUS_TO_FAIL = 1, TRx_STATUS_FAIL = 2
+ */
+STATUS_TRx TRx_PCRMU_ShutDown_Enable(void)
+{
+    uint8_t u8Array[4];
+
+    TRx_READREG(0x4004, u8Array);
+    OR_U8_ARRAY(u8Array, 0x00, 0x10, 0x00, 0x00);
+    TRx_WRITEREG(0x4004, u8Array);
+
+    TRx_READREG(0x0020, u8Array);
+    AND_U8_ARRAY(u8Array, 0x00, 0x00, 0x00, 0x3B);
+    return TRx_WRITEREG(0x0020, u8Array);
+}
+
+/**
+ * @brief  Disable PCRMU Shutdown mode.
+ * @param  None
+ * @retval TRx_STATUS_SUCCESS = 0, TRx_STATUS_TO_FAIL = 1, TRx_STATUS_FAIL = 2
+ */
+STATUS_TRx TRx_PCRMU_ShutDown_Disable(void)
+{
+    uint8_t u8Array[4];
+
+    TRx_READREG(0x4004, u8Array);
+    AND_U8_ARRAY(u8Array, 0xFF, 0xE7, 0xFF, 0xFF);
+    TRx_WRITEREG(0x4004, u8Array);
+
+    TRx_READREG(0x0020, u8Array);
+    OR_U8_ARRAY(u8Array, 0x00, 0x00, 0x00, 0x04);
+    return TRx_WRITEREG(0x0020, u8Array);
+}
+
 #endif
 
 #ifdef EXTERN_RF_APIS_SINGLE_TONE

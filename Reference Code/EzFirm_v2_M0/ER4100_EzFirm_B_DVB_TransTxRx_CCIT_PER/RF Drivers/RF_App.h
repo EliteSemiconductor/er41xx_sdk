@@ -35,6 +35,7 @@ void XTAPP_ReceiveCheck(uint16_t* data_len);
 /* TX Control */
 void XTAPP_SendData(uint8_t* tx_data, uint8_t data_len);
 /* Configuration & Init */
+void dump_rf_config(void);
 uint8_t XTAPP_Init(void);
 /* IRQ Handler */
 void XTAPP_IrqHdlr(void);

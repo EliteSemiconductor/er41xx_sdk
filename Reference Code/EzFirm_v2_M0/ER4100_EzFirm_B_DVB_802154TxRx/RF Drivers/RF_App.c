@@ -145,7 +145,6 @@ void dump_rf_config(void)
 //           pa1_cfg.reg_data[3], pa1_cfg.reg_data[2], pa1_cfg.reg_data[1], pa1_cfg.reg_data[0],
 //           pa2_cfg.reg_data[3], pa2_cfg.reg_data[2], pa2_cfg.reg_data[1], pa2_cfg.reg_data[0]);
 
-    /* Level occupies bit6:0 of ANCTL_CONFIG_7 byte3, bit7 is a separate enable flag */
     printf("TX Power Level : %u\r\n", (unsigned)((pwr_cfg.reg_data[3]>>1) & 0x7F));
 
     printf("FIFO Order     : 0x%02X (MSB_INV=%u)\r\n",
@@ -158,8 +157,6 @@ void dump_rf_config(void)
 
     printf("TX FIFO Mode   : 0x%02X\r\n", txmode_cfg.reg_data[0]);
 
-    /* This config header does not program MAC_RX_802 (0xA008), the RX-side
-       counterpart of MAC_TX_CFG - it is left at the chip's power-on default. */
     printf("RX FIFO Mode   : 0x%02X (set by gtXtAppConfigInfo.rx_mode in FW)\r\n", gtXtAppConfigInfo.rx_mode);
 
     printf("Syncword       : 0x%08lX\r\n", (unsigned long)PREDEFINED_RX_SYNCWORD);
@@ -332,7 +329,7 @@ void XTAPP_Scan(void)
         while(RF_NIRQ_VAL());
         TRx_GetIntStatus(u8Array);
         TRx_ClearIntFlag(u8Array);
-        UART0_SendStr("Tx done.\r\n");
+        printf("Tx done.\r\n");
         /* TX complete event */
         while(DVB_SW5_PIN == 0);   // Wait for button release
         

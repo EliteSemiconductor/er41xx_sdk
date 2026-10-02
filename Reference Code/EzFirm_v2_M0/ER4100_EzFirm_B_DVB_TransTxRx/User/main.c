@@ -87,14 +87,12 @@ int main(void)
     InitialUART0_Timer1(UART_BAUD_115200);
     GPIO_Init();
 
-    UART0_SendStr("\r\nMainFw Build At:");
-    UART0_SendStr(MainFwBuildTime);
-    UART0_SendStr("\r\n");
+    printf("\r\nMainFw Build At:%s\r\n", MainFwBuildTime);
 
     if(XTAPP_Init()==0)
-        UART0_SendStr("TransTxRx : init done\r\n");
+        printf("TransTxRx : init done\r\n");
     else
-        UART0_SendStr("TransTxRx : init fail\r\n");
+        printf("TransTxRx : init fail\r\n");
     while (1)
     {
         XTAPP_Scan();

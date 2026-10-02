@@ -40,9 +40,9 @@ void main(void)
     InitialUART0_Timer1(UART_BAUD_115200);
     GPIO_Init();
     if(XTAPP_Init()==0)
-        UART0_SendStr("TransTxRx : init done\r\n");
+        UART0_SendStr("TransTxRx_CCIT : init done\r\n");
     else
-        UART0_SendStr("TransTxRx : init fail\r\n");
+        UART0_SendStr("TransTxRx_CCIT : init fail\r\n");
     while (1)
     {
         XTAPP_Scan();

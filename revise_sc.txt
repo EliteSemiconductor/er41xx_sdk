@@ -12,8 +12,12 @@ A.  EzGen / EzCodeGen  ->  EzToolkit V2.0
 ================================================================================
   移除   EzGen/EzCodeGen2_20260812_V2.3.exe（整个 EzGen/ 目录）
   新增   Tools/ER41xx EzToolkit_V2.0_20260929.exe
-         Tools/EzToolkit_settings_common_example.ini
-         Tools/EzToolkit_settings_802154_example.ini
+         Tools/EzToolkit_settings_TransTxRx.ini
+         Tools/EzToolkit_settings_longPkt.ini
+         Tools/EzToolkit_settings_WOR.ini
+         Tools/EzToolkit_settings_802154.ini
+         Tools/EzToolkit_settings_GPIO0_TRBSY.ini
+         （按示例分组提供设定文件，见 B 节）
 
   EzToolkit 为 Windows GUI 辅助开发工具（.NET Framework 4.8 / WinForms）。
   保留 EzCodeGen 的寄存器生成功能，并搭配 DVB 评估板（USB 转 UART）新增
@@ -54,24 +58,46 @@ B.  EzFirm 1.x（EzFirm_N76E003）  ->  EzFirm 2.0
   专案命名：ER4100_EzFirm_B_<Platform>_<Variant>
     Platform  N76 = N76E003，DVB = DVB 板上的 Nano100
 
-  示例（两个平台均提供）：
-    TransTxRx            基本透明模式收发
-    TransTxRx_CCIT       透明模式收发，带序号与软件 CRC-CCITT 校验
-    TransTxRx_CCIT_PER   基于 TransTxRx_CCIT 的误包率（PER）测试
-    802154TxRx           IEEE 802.15.4 收发
-    GIO_TRBSY            通过 UART 命令将 GPIO0 切换为 TR_BSY 输出，
-                         观察收发忙碌时序
+  示例（共 11 个，两个平台均提供）：
+
+  透明传输模式：
+    TransTxRx              基本透明模式收发
+    TransTxRx_CCIT         透明模式收发，带序号与软件 CRC-CCITT 校验
+    TransTxRx_CCIT_PER     基于 TransTxRx_CCIT 的误包率（PER）测试
+                           （100 包，间隔 30 ms）
+    TransTxRx_LongPkt      512 字节长包收发，利用 TX FIFO 将空／
+                           RX FIFO 将满阈值
+    TransWOR               无线唤醒（WOR）接收（WUT 周期 1 s，
+                           RX 窗口 4 × 20 ms = 80 ms）
+    TransWOR_Ack_CCIT      WOR 接收并做 CRC-CCITT 校验；收到有效包
+                           200 ms 后回复 "ACK"
+
+  IEEE 802.15.4 模式：
+    802154TxRx             IEEE 802.15.4 收发，含 RX 错误详情输出
+    802154TxRx_Addressing  PAN ID／短地址过滤；UART 命令 1~4 分别发送
+                           匹配／广播／PAN ID 不匹配／地址不匹配帧
+
+  测试 / 工具：
+    SingleTone             持续发射单音载波，按键切换开／关
+    RSSI_Scan              RSSI（CCA）扫描，每 1 秒输出一次
+    GIO_TRBSY              通过 UART 命令将 GPIO0 切换为 TR_BSY 输出，
+                           观察收发忙碌时序
+
+  EzFirm 1.x（EzFirm_N76E003）中以下示例未纳入 EzFirm 2.0：
+  802154TxRx_CCA、802154TxRx_PER、5 个 NFC 示例、PowerSaving、
+  PowerSaving_WUT。
 
   各专案的 SPI_ER41xx_config.h 改由 EzToolkit 生成。
+  各示例的使用方式（按键／UART 命令、对端板、程序流程）请见
+  Reference Code/FirmList_SC.md（英文版 FirmList.md）。
 
 ================================================================================
 C.  仓库结构
 ================================================================================
   Tools/             EzToolkit 及示例 .ini 文件
   Reference Code/    EzFirm 2.0（8051 / M0）
-  Document/          SDK_EZ 用户指南
   Datasheet/         ER4100 数据手册
-  Application Note/  应用笔记
+  Application Note/  ER41xx SDK_EZ 使用手册（ESAP-SPHYNX-026 v2.0，简中）
   GitHub：github.com/EliteSemiconductor/er41xx_sdk
 
 ################################################################################

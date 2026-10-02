@@ -13,8 +13,6 @@
 #define SDK_EZ_8BIT
 /* Includes ------------------------------------------------------------------*/
 #include "SPI_ER41xx_config.h"
-//#include "SPI_ER41xx_config_384_915_96.h"
-//#include "SPI_ER41xx_config_400_915_100.h"
 /* Definition & Macro --------------------------------------------------------*/    
 #define BASIC_API_VER             "V4.05.10"
 /* Extend RF APIs */

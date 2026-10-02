@@ -92,7 +92,7 @@ void dump_buffer(uint8_t *buf, uint16_t len, uint8_t rx_fg, uint16_t rssi)
             UART0_SendStr("    ");
         }
         UART0_SendHex8(buf[ii]);
-        Send_Data_To_UART0(' ');
+        UART0_SendStr(' ');
     }
 
     UART0_SendStr("\r\n");
@@ -169,7 +169,9 @@ void dump_rf_config(void)
     UART0_SendHex8(txmode_cfg.reg_data[0]);
     UART0_SendStr("\r\n");
 
-    UART0_SendStr("RX FIFO Mode   : not set by this config header (chip default)\r\n");
+    UART0_SendStr("RX FIFO Mode   : ");
+    UART0_SendHex8(gtXtAppConfigInfo.rx_mode);
+    UART0_SendStr(" (set by gtXtAppConfigInfo.rx_mode in FW)\r\n");
     UART0_SendStr("Syncword       : 0x");
     UART0_SendU32Hex8((uint32_t)PREDEFINED_RX_SYNCWORD);
     UART0_SendStr("\r\n");

@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>TransTxRx_PER</TargetName>
+    <TargetName>TransTxRx_CCIT_PER</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

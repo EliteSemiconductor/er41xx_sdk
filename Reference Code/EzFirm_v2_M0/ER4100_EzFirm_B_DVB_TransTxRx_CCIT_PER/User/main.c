@@ -87,9 +87,7 @@ int main(void)
     InitialUART0_Timer1(UART_BAUD_115200);
     GPIO_Init();
 
-    UART0_SendStr("\r\nMainFw Build At:");
-    UART0_SendStr(MainFwBuildTime);
-    UART0_SendStr("\r\n");
+    printf("\r\nMainFw Build At:%s\r\n", MainFwBuildTime);
 
     if(XTAPP_Init()==0)
         printf("TransTxRx_PER_CCIT(max_pkt:%03d) : init done\r\n", PER_TX_COUNT);
