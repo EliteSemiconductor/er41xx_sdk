@@ -25,3 +25,7 @@ JLinkLog.txt
 # OS files
 Thumbs.db
 .DS_Store
+
+# Internal revision notes (kept locally, not published)
+revise.txt
+revise_sc.txt

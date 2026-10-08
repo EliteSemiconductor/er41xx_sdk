@@ -2,7 +2,7 @@
 /*
  * @file     main.c
  * @version  V1.0.0
- * @brief    Main entry point for ER4100 TransTxRx application on N76E003
+ * @brief    Main entry point for ER4100 TransWOR_Ack_CCIT application on N76E003
  *
  * @copyright (C) COPYRIGHT 2024 ESMT
  * Technology Corp. All rights reserved.

@@ -11,7 +11,7 @@ low-end MCUs. It has two parts:
 
 > **SDK_EZ v2.0 changes:** EzGen / EzCodeGen has been replaced by **EzToolkit**, and EzFirm
 > moves to **2.0** (N76E003 and Nano100 platforms). The previous `EzGen/` and
-> `EzFirm_N76E003/` folders have been removed. See [`revise.txt`](revise.txt).
+> `EzFirm_N76E003/` folders have been removed.
 
 ---
 
@@ -20,8 +20,8 @@ low-end MCUs. It has two parts:
 - [`Tools/`](Tools/) : `ER41xx EzToolkit_V2.0_20260929.exe` and example `.ini` settings files
 - [`Reference Code/EzFirm_v2_8051/`](Reference%20Code/EzFirm_v2_8051/) : EzFirm 2.0 for Nuvoton **N76E003** (8051), Keil C51
 - [`Reference Code/EzFirm_v2_M0/`](Reference%20Code/EzFirm_v2_M0/) : EzFirm 2.0 for Nuvoton **Nano100** (Cortex-M0) on the DVB board, Keil MDK; includes `Nano100Lib`
+- [`Reference Code/FirmList.md`](Reference%20Code/FirmList.md) : **detailed description of every EzFirm example** (how to run, UART commands, peer board)
 - [`Application Note/`](Application%20Note/) : **ER41xx SDK_EZ User Guide** (ESAP-SPHYNX-026, v2.0, Simplified Chinese)
-- [`revise.txt`](revise.txt) : Revision notes
 
 ---
 
@@ -54,33 +54,50 @@ frequency-offset calibration and freezing parameters for mass production.
 
 Settings are saved / loaded as `.ini` files. Examples in `Tools/`:
 
-- `EzToolkit_settings_TransTxRx.ini` : `TransTxRx` / `TransTxRx_CCIT` / `TransTxRx_CCIT_PER`
+- `EzToolkit_settings_TransTxRx.ini` : `TransTxRx` / `TransTxRx_CCIT` / `TransTxRx_CCIT_PER` / `SingleTone` / `RSSI_Scan`
 - `EzToolkit_settings_longPkt.ini` : `TransTxRx_LongPkt`
 - `EzToolkit_settings_WOR.ini` : `TransWOR` / `TransWOR_Ack_CCIT`
 - `EzToolkit_settings_802154.ini` : `802154TxRx` / `802154TxRx_Addressing`
+- `EzToolkit_settings_802154_TXCCA.ini` : `802154TxRx_CCA` (802154 settings + `INT_ST_TXERR` enabled)
 - `EzToolkit_settings_GPIO0_TRBSY.ini` : `GIO_TRBSY`
+- `EzToolkit_settings_PowerSaving.ini` : `PowerSaving` / `PowerSaving_Shutdown` / `PowerSaving_WUT`
+- `EzToolkit_settings_WakeupTimer.ini` : `WakeupTimer(WUT)`
 
 ---
 
 ## EzFirm 2.0 Examples
 
-Every example is provided for both platforms:
+> **Details of every example — start-up behaviour, buttons / UART commands, peer board,
+> UART log and program flow — are in
+> [`Reference Code/FirmList.md`](Reference%20Code/FirmList.md).**
+> This section is only a summary.
+
+Every example is provided for both platforms (16 examples each):
 `ER4100_EzFirm_B_N76_<Variant>` (N76E003) and `ER4100_EzFirm_B_DVB_<Variant>` (Nano100).
 
+**Transparent mode**
 - `TransTxRx` : Basic Transparent-mode TX/RX
 - `TransTxRx_CCIT` : Transparent TX/RX with sequence number and software CRC-CCITT check
 - `TransTxRx_CCIT_PER` : Packet Error Rate test based on `TransTxRx_CCIT`
 - `TransTxRx_LongPkt` : Long-packet TX/RX (512-byte payload) using FIFO threshold handling
 - `TransWOR` : Wake-on-Radio receive
 - `TransWOR_Ack_CCIT` : Wake-on-Radio receive with CRC-CCITT check and automatic `"ACK"` reply
+
+**IEEE 802.15.4 mode**
 - `802154TxRx` : IEEE 802.15.4 TX/RX
 - `802154TxRx_Addressing` : IEEE 802.15.4 PAN ID / address filtering (matched and broadcast frames)
+- `802154TxRx_CCA` : IEEE 802.15.4 TX with CCA (listen before talk): transmits only when the channel energy is below the threshold (-80 dBm)
+
+**Power saving / wakeup timer**
+- `PowerSaving` : Enter / leave deep sleep by button
+- `PowerSaving_Shutdown` : Shut down the ER4100 through its GPIO1 pin (lowest power)
+- `PowerSaving_WUT` : Deep sleep with periodic wake-up by the wakeup timer (WUT)
+- `WakeupTimer(WUT)` : Wakeup timer in active mode; period / periodic or one-shot mode set by UART
+
+**Test / tool**
 - `SingleTone` : Continuous carrier output for RF testing
 - `RSSI_Scan` : Background RF energy (RSSI) scan, printed every 1 s
 - `GIO_TRBSY` : Switch GPIO0 to TR_BSY output via UART commands to observe TX/RX busy timing
-
-How to run each example (buttons, UART commands, peer board, program flow):
-[`Reference Code/FirmList.md`](Reference%20Code/FirmList.md).
 
 Project layout: `User/` (main), `RF Drivers/` (`RF_App`, `RF_Hal`, `ER4100Api/SPI_ER41xx*`),
 `Common/` (UART, delay), plus `Project/` (8051, `.uvproj`) or `Keil/` (M0, `.uvprojx`).
@@ -96,7 +113,8 @@ Project layout: `User/` (main), `RF Drivers/` (`RF_App`, `RF_Hal`, `ER4100Api/SP
 3. Open the Keil project and Build All (F7):
    - N76E003: `Project/*.uvproj` (Keil C51)
    - Nano100: `Keil/*.uvprojx` (Keil MDK-ARM)
-4. Flash the output via Nu-Link.
+4. Flash the output via Nu-Link, then follow the example's section in
+   [`Reference Code/FirmList.md`](Reference%20Code/FirmList.md) to run it.
 
 ### Notes
 

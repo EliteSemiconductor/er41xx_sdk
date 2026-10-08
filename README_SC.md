@@ -9,8 +9,7 @@ SDK_EZ 让开发者能在低阶微控制器平台上轻松开发 ESMT ER41xx 系
   头文件。
 
 > **SDK_EZ v2.0 变更：** EzGen / EzCodeGen 已由 **EzToolkit** 取代，EzFirm 升级至 **2.0**
-> （支持 N76E003 与 Nano100 两个平台）。原 `EzGen/` 与 `EzFirm_N76E003/` 目录已移除，
-> 详见 [`revise_sc.txt`](revise_sc.txt)。
+> （支持 N76E003 与 Nano100 两个平台）。原 `EzGen/` 与 `EzFirm_N76E003/` 目录已移除。
 
 ---
 
@@ -19,8 +18,8 @@ SDK_EZ 让开发者能在低阶微控制器平台上轻松开发 ESMT ER41xx 系
 - [`Tools/`](Tools/) : `ER41xx EzToolkit_V2.0_20260929.exe` 及示例 `.ini` 设定文件
 - [`Reference Code/EzFirm_v2_8051/`](Reference%20Code/EzFirm_v2_8051/) : 基于 Nuvoton **N76E003**（8051）的 EzFirm 2.0，Keil C51
 - [`Reference Code/EzFirm_v2_M0/`](Reference%20Code/EzFirm_v2_M0/) : 基于 DVB 板上 Nuvoton **Nano100**（Cortex-M0）的 EzFirm 2.0，Keil MDK；附 `Nano100Lib`
+- [`Reference Code/FirmList_SC.md`](Reference%20Code/FirmList_SC.md) : **各 EzFirm 示例的详细说明**（操作方式、UART 命令、对端板）
 - [`Application Note/`](Application%20Note/) : **ER41xx SDK_EZ 使用手册**（ESAP-SPHYNX-026，v2.0，简体中文）
-- [`revise_sc.txt`](revise_sc.txt) : 版本说明
 
 ---
 
@@ -51,33 +50,49 @@ Windows GUI 辅助开发工具（.NET Framework 4.8 / WinForms）。搭配 DVB �
 
 参数可另存／读取为 `.ini` 设定文件。`Tools/` 中的示例：
 
-- `EzToolkit_settings_TransTxRx.ini` : `TransTxRx`／`TransTxRx_CCIT`／`TransTxRx_CCIT_PER`
+- `EzToolkit_settings_TransTxRx.ini` : `TransTxRx`／`TransTxRx_CCIT`／`TransTxRx_CCIT_PER`／`SingleTone`／`RSSI_Scan`
 - `EzToolkit_settings_longPkt.ini` : `TransTxRx_LongPkt`
 - `EzToolkit_settings_WOR.ini` : `TransWOR`／`TransWOR_Ack_CCIT`
 - `EzToolkit_settings_802154.ini` : `802154TxRx`／`802154TxRx_Addressing`
+- `EzToolkit_settings_802154_TXCCA.ini` : `802154TxRx_CCA`（802154 设定 + 开启 `INT_ST_TXERR`）
 - `EzToolkit_settings_GPIO0_TRBSY.ini` : `GIO_TRBSY`
+- `EzToolkit_settings_PowerSaving.ini` : `PowerSaving`／`PowerSaving_Shutdown`／`PowerSaving_WUT`
+- `EzToolkit_settings_WakeupTimer.ini` : `WakeupTimer(WUT)`
 
 ---
 
 ## EzFirm 2.0 示例
 
-每个示例均提供两个平台版本：
+> **各示例的详细说明——启动行为、按键／UART 命令、对端板、UART 日志与程序流程——
+> 请见 [`Reference Code/FirmList_SC.md`](Reference%20Code/FirmList_SC.md)。**
+> 本节仅为摘要。
+
+每个示例均提供两个平台版本（各 16 个）：
 `ER4100_EzFirm_B_N76_<Variant>`（N76E003）与 `ER4100_EzFirm_B_DVB_<Variant>`（Nano100）。
 
+**透明传输模式**
 - `TransTxRx` : 基本透明模式收发
 - `TransTxRx_CCIT` : 透明模式收发，带序号与软件 CRC-CCITT 校验
 - `TransTxRx_CCIT_PER` : 基于 `TransTxRx_CCIT` 的误包率（PER）测试
 - `TransTxRx_LongPkt` : 长包收发（512 字节 payload），通过 FIFO 阈值管理实现
 - `TransWOR` : 无线唤醒（WOR）接收
 - `TransWOR_Ack_CCIT` : WOR 接收，带 CRC-CCITT 校验并自动回复 `"ACK"`
+
+**IEEE 802.15.4 模式**
 - `802154TxRx` : IEEE 802.15.4 收发
 - `802154TxRx_Addressing` : IEEE 802.15.4 PAN ID／地址过滤（匹配帧与广播帧）
+- `802154TxRx_CCA` : IEEE 802.15.4 CCA 发射（先听后发，Listen Before Talk）：信道能量低于门槛（-80 dBm）才发射
+
+**省电／唤醒定时器**
+- `PowerSaving` : 以按键进入／退出深度睡眠
+- `PowerSaving_Shutdown` : 以 ER4100 GPIO1 引脚关机（最低功耗）
+- `PowerSaving_WUT` : 深度睡眠，由唤醒定时器（WUT）周期唤醒
+- `WakeupTimer(WUT)` : active 模式下的唤醒定时器，以 UART 设定周期及周期／单次模式
+
+**测试／工具**
 - `SingleTone` : 持续发射单音载波，用于 RF 测试
 - `RSSI_Scan` : 背景射频能量（RSSI）扫描，每 1 秒输出一次
 - `GIO_TRBSY` : 通过 UART 命令将 GPIO0 切换为 TR_BSY 输出，观察收发忙碌时序
-
-各示例的使用方式（按键、UART 命令、对端板、程序流程）请见
-[`Reference Code/FirmList_SC.md`](Reference%20Code/FirmList_SC.md)。
 
 工程结构：`User/`（main）、`RF Drivers/`（`RF_App`、`RF_Hal`、`ER4100Api/SPI_ER41xx*`）、
 `Common/`（UART、延时），以及 `Project/`（8051，`.uvproj`）或 `Keil/`（M0，`.uvprojx`）。
@@ -93,7 +108,8 @@ Windows GUI 辅助开发工具（.NET Framework 4.8 / WinForms）。搭配 DVB �
 3. 打开 Keil 工程并全部编译（F7）：
    - N76E003：`Project/*.uvproj`（Keil C51）
    - Nano100：`Keil/*.uvprojx`（Keil MDK-ARM）
-4. 通过 Nu-Link 烧录输出文件。
+4. 通过 Nu-Link 烧录输出文件，再依照
+   [`Reference Code/FirmList_SC.md`](Reference%20Code/FirmList_SC.md) 中对应示例的说明操作。
 
 ### 注意事项
 
